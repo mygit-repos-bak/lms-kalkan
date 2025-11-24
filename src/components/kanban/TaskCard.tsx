@@ -97,13 +97,6 @@ export function TaskCard({ task, isDragging = false, onEdit, onClick, onCreateSu
         </div>
       )}
 
-      {/* Parent Task Info for Subtasks - Moved to top */}
-      {task.task_level > 0 && task.parent && (
-        <div className="mb-2 p-2 bg-white bg-opacity-60 rounded text-xs border border-gray-200">
-          <span className="font-semibold text-gray-700">{task.parent.title}</span>
-        </div>
-      )}
-
       <div className="flex items-start justify-between mb-3">
         <div className="flex-1 pr-2">
           <h4 className={clsx(
@@ -113,7 +106,6 @@ export function TaskCard({ task, isDragging = false, onEdit, onClick, onCreateSu
             task.task_level === 2 ? 'text-green-900' :
             'text-purple-900'
           )}>
-            {task.task_level > 0 && '├─ '}
             {task.title}
           </h4>
         </div>
