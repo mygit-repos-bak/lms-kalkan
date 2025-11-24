@@ -86,6 +86,14 @@ export function TaskCard({ task, isDragging = false, onEdit, onClick, onCreateSu
         </div>
       )}
 
+      {/* Parent Task Info for Subtasks - Moved to top */}
+      {task.task_level > 0 && task.parent && (
+        <div className="mb-2 p-2 bg-white bg-opacity-60 rounded text-xs border border-gray-200">
+          <span className="text-gray-500">Parent: </span>
+          <span className="font-semibold text-gray-700">{task.parent.title}</span>
+        </div>
+      )}
+
       <div className="flex items-start justify-between mb-3">
         <div className="flex-1 pr-2">
           <h4 className={clsx(
@@ -141,12 +149,6 @@ export function TaskCard({ task, isDragging = false, onEdit, onClick, onCreateSu
         </div>
       )}
 
-      {/* Parent Task Info for Subtasks */}
-      {task.task_level > 0 && task.parent && (
-        <div className="mb-3 p-2 bg-gray-100 rounded text-xs text-gray-600 border-l-2 border-gray-300">
-          <span className="font-medium">{task.parent.title}</span>
-        </div>
-      )}
       {task.description && (
         <p className={clsx(
           "text-xs mb-3 line-clamp-2",

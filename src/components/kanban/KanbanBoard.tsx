@@ -136,7 +136,10 @@ export function KanbanBoard({ itemId, sectionId, showCombined = false }: KanbanB
     const { active, over } = event;
     setDraggedTask(null);
 
-    if (!over) return;
+    // If dropped outside a valid drop zone, do nothing (task stays in place)
+    if (!over) {
+      return;
+    }
 
     const taskId = active.id as string;
     const newStage = over.id as string;
