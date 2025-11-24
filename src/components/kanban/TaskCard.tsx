@@ -72,12 +72,12 @@ export function TaskCard({ task, isDragging = false, onEdit, onClick, onCreateSu
   };
 
   return (
-    <div 
+    <div
       ref={setNodeRef}
       style={style}
       {...attributes}
       className={clsx(
-        'group rounded-lg border border-l-4 p-4 shadow-sm transition-all cursor-pointer relative overflow-hidden',
+        'group rounded-lg border border-l-4 p-4 shadow-sm transition-all cursor-pointer relative overflow-visible',
         task.task_level === 0 ? getTaskLevelColor(task.task_level) : getTaskLevelColor(task.task_level),
         getTaskLevelAccent(task.task_level),
         isDragging || isSortableDragging ? 'opacity-90 shadow-xl scale-105 z-50 bg-white border-2 border-amber-400' : 'hover:shadow-md',
@@ -88,22 +88,22 @@ export function TaskCard({ task, isDragging = false, onEdit, onClick, onCreateSu
       {/* Task Level Indicator for subtasks */}
       {task.task_level > 0 && task.parent && (
         <div className={clsx(
-          "absolute -left-2 top-4 px-2 py-1 rounded flex items-center justify-center text-white text-xs font-medium max-w-[150px] truncate",
+          "absolute left-0 top-2 px-2 py-0.5 rounded text-white text-[10px] font-medium max-w-[100px] truncate z-10",
           task.task_level === 1 ? 'bg-blue-500' :
           task.task_level === 2 ? 'bg-green-500' :
           'bg-purple-500'
         )} title={task.parent.title}>
-          <span className="truncate">{task.parent.title}</span>
+          <span className="truncate block">{task.parent.title}</span>
         </div>
       )}
 
-      <div className="flex items-start justify-between mb-3">
+      <div className="flex items-start justify-between gap-2 mb-3">
         <div className={clsx(
-          "flex-1 pr-2",
-          task.task_level > 0 && task.parent && "ml-8"
+          "flex-1 min-w-0",
+          task.task_level > 0 && task.parent && "pt-5"
         )}>
           <h4 className={clsx(
-            "font-medium text-sm leading-tight",
+            "font-medium text-sm leading-tight break-words",
             task.task_level === 0 ? 'text-gray-900' :
             task.task_level === 1 ? 'text-blue-900' :
             task.task_level === 2 ? 'text-green-900' :
