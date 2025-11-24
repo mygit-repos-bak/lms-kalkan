@@ -138,6 +138,7 @@ export function KanbanBoard({ itemId, sectionId, showCombined = false }: KanbanB
 
     // If dropped outside a valid drop zone, do nothing (task stays in place)
     if (!over) {
+      toast.error('Task must be dropped in a stage');
       return;
     }
 
