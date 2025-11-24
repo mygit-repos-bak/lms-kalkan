@@ -98,7 +98,10 @@ export function TaskCard({ task, isDragging = false, onEdit, onClick, onCreateSu
       )}
 
       <div className="flex items-start justify-between mb-3">
-        <div className="flex-1 pr-2">
+        <div className={clsx(
+          "flex-1 pr-2",
+          task.task_level > 0 && task.parent && "ml-8"
+        )}>
           <h4 className={clsx(
             "font-medium text-sm leading-tight",
             task.task_level === 0 ? 'text-gray-900' :

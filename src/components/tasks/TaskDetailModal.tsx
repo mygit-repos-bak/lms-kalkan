@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Calendar, User, Clock, CheckSquare, ExternalLink, AlertCircle, CreditCard as Edit3, Layers } from 'lucide-react';
+import { X, Calendar, User, Clock, CheckSquare, ExternalLink, AlertCircle, CreditCard as Edit3, Layers, Trash2 } from 'lucide-react';
 import { Task } from '../../types/database';
 import clsx from 'clsx';
 
@@ -64,6 +64,20 @@ export default function TaskDetailModal({ isOpen, onClose, task, onEdit, onDelet
                 title="Edit task"
               >
                 <Edit3 className="w-5 h-5 text-gray-600" />
+              </button>
+            )}
+            {onDelete && (
+              <button
+                onClick={() => {
+                  if (window.confirm('Are you sure you want to delete this task?')) {
+                    onDelete(task);
+                    onClose();
+                  }
+                }}
+                className="p-2 hover:bg-red-100 rounded-lg transition-colors"
+                title="Delete task"
+              >
+                <Trash2 className="w-5 h-5 text-red-600" />
               </button>
             )}
             <button
