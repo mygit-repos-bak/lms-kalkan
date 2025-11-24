@@ -112,7 +112,7 @@ export function TaskCard({ task, isDragging = false, onEdit, onClick, onCreateSu
             {task.title}
           </h4>
         </div>
-        <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="flex items-start space-x-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
           {onCreateSubtask && (
             <button
               onClick={(e) => {
@@ -131,17 +131,17 @@ export function TaskCard({ task, isDragging = false, onEdit, onClick, onCreateSu
                 e.stopPropagation();
                 onEdit();
               }}
-             className="p-1 hover:bg-gray-100 rounded transition-colors"
-             title="Edit task"
+              className="p-1 hover:bg-gray-100 rounded transition-colors"
+              title="Edit task"
             >
               <Edit3 className="w-3 h-3 text-gray-400" />
             </button>
           )}
           <div
             {...listeners}
-           className="p-1 cursor-grab active:cursor-grabbing hover:bg-gray-100 rounded transition-colors"
+            className="p-1 cursor-grab active:cursor-grabbing hover:bg-gray-100 rounded transition-colors"
             onClick={(e) => e.stopPropagation()}
-           title="Move task"
+            title="Move task"
           >
             <GripVertical className="w-3 h-3 text-gray-400" />
           </div>
