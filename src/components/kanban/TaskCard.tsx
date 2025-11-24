@@ -214,6 +214,18 @@ export function TaskCard({ task, isDragging = false, onEdit, onClick, onCreateSu
                 <Edit3 className="w-3 h-3 text-gray-400" />
               </button>
             )}
+            {onDelete && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete();
+                }}
+                className="p-1 hover:bg-gray-100 rounded transition-colors"
+                title="Delete task"
+              >
+                <Trash2 className="w-3 h-3 text-red-400" />
+              </button>
+            )}
             <div
               {...listeners}
               className="p-1 cursor-grab active:cursor-grabbing hover:bg-gray-100 rounded transition-colors"
