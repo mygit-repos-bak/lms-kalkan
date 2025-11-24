@@ -393,8 +393,7 @@ export const db = {
           tag:tags(*)
         ),
         item:items(*),
-        parent:tasks!parent_task_id(id, title, task_level, stage),
-        children:tasks!parent_task_id(id, title, task_level, task_order)
+        parent:tasks!parent_task_id(*)
       `)
       .order('created_at', { ascending: false });
     
