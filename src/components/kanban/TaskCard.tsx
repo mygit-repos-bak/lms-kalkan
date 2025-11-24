@@ -89,7 +89,6 @@ export function TaskCard({ task, isDragging = false, onEdit, onClick, onCreateSu
       {/* Parent Task Info for Subtasks - Moved to top */}
       {task.task_level > 0 && task.parent && (
         <div className="mb-2 p-2 bg-white bg-opacity-60 rounded text-xs border border-gray-200">
-          <span className="text-gray-500">Parent: </span>
           <span className="font-semibold text-gray-700">{task.parent.title}</span>
         </div>
       )}
