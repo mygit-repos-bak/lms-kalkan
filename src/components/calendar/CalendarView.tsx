@@ -106,9 +106,22 @@ export function CalendarView() {
           const taskItem = allItems.find(item => item.id === task.item_id);
           const isCompleted = task.status.toLowerCase() === 'completed';
           if (!isCompleted || showCompleted) {
+            // Build hierarchical title for tasks
+            let taskTitle = task.title;
+            if (task.task_level > 0 && task.parent) {
+              // For level 2 tasks, show grandparent > parent > task
+              if (task.task_level === 2 && task.parent.parent) {
+                taskTitle = `${task.parent.parent.title} > ${task.parent.title} > ${task.title}`;
+              }
+              // For level 1 tasks, show parent > task
+              else {
+                taskTitle = `${task.parent.title} > ${task.title}`;
+              }
+            }
+
             calendarEvents.push({
               id: `task-${task.id}`,
-              title: `Task: ${task.title}`,
+              title: `Task: ${taskTitle}`,
               start: new Date(task.due_date),
               end: new Date(task.due_date),
               allDay: true,
