@@ -415,7 +415,7 @@ export const db = {
     if (parentTaskIds.length > 0) {
       const { data: parents, error: parentError } = await supabase
         .from('tasks')
-        .select('id, title, task_level, stage')
+        .select('id, title, task_level, stage, parent_task_id')
         .in('id', parentTaskIds);
 
       if (!parentError && parents) {
@@ -423,8 +423,31 @@ export const db = {
       }
     }
 
-    // Create a map of parent tasks for quick lookup
+    // Get grandparent task IDs (for level 2 tasks)
+    const grandparentTaskIds = [...new Set(parentTasks.filter(p => p.parent_task_id).map(p => p.parent_task_id))];
+
+    let grandparentTasks: any[] = [];
+    if (grandparentTaskIds.length > 0) {
+      const { data: grandparents, error: grandparentError } = await supabase
+        .from('tasks')
+        .select('id, title, task_level, stage')
+        .in('id', grandparentTaskIds);
+
+      if (!grandparentError && grandparents) {
+        grandparentTasks = grandparents;
+      }
+    }
+
+    // Create maps for quick lookup
     const parentMap = new Map(parentTasks.map(p => [p.id, p]));
+    const grandparentMap = new Map(grandparentTasks.map(g => [g.id, g]));
+
+    // Attach grandparents to parents
+    parentTasks.forEach(parent => {
+      if (parent.parent_task_id) {
+        parent.parent = grandparentMap.get(parent.parent_task_id) || null;
+      }
+    });
 
     // Transform the data to match our expected format
     const transformedData = data?.map(task => ({

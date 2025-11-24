@@ -87,20 +87,33 @@ export function TaskCard({ task, isDragging = false, onEdit, onClick, onCreateSu
     >
       {/* Task Level Indicator for subtasks */}
       {task.task_level > 0 && task.parent && (
-        <div className={clsx(
-          "absolute left-0 top-2 px-2 py-0.5 rounded text-white text-[10px] font-medium max-w-[100px] truncate z-10",
-          task.task_level === 1 ? 'bg-blue-500' :
-          task.task_level === 2 ? 'bg-green-500' :
-          'bg-purple-500'
-        )} title={task.parent.title}>
-          <span className="truncate block">{task.parent.title}</span>
+        <div className="absolute left-0 top-2 flex flex-col gap-0.5 z-10">
+          {/* Show grandparent for level 2 tasks */}
+          {task.task_level === 2 && task.parent.parent && (
+            <div
+              className="px-2 py-0.5 rounded bg-gray-600 text-white text-[10px] font-medium max-w-[100px] truncate"
+              title={`Level 0: ${task.parent.parent.title}`}
+            >
+              <span className="truncate block">{task.parent.parent.title}</span>
+            </div>
+          )}
+          {/* Show direct parent */}
+          <div className={clsx(
+            "px-2 py-0.5 rounded text-white text-[10px] font-medium max-w-[100px] truncate",
+            task.task_level === 1 ? 'bg-blue-500' :
+            task.task_level === 2 ? 'bg-green-500' :
+            'bg-purple-500'
+          )} title={task.parent.title}>
+            <span className="truncate block">{task.parent.title}</span>
+          </div>
         </div>
       )}
 
       <div className="mb-3">
         <div className={clsx(
           "flex-1 min-w-0",
-          task.task_level > 0 && task.parent && "pt-5"
+          task.task_level === 1 && task.parent && "pt-5",
+          task.task_level === 2 && task.parent && "pt-8"
         )}>
           <h4 className={clsx(
             "font-medium text-sm leading-tight break-words",
