@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, momentLocalizer, Views } from 'react-big-calendar';
+import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop';
 import moment from 'moment';
 import { db } from '../../lib/database';
 import { ChevronLeft, ChevronRight, Filter, Download, Bell } from 'lucide-react';
@@ -8,8 +9,10 @@ import { Item, Task } from '../../types/database';
 import ItemModal from '../items/ItemModal';
 import clsx from 'clsx';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
+import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
 
 const localizer = momentLocalizer(moment);
+const DnDCalendar = withDragAndDrop(Calendar);
 
 interface CalendarEvent {
   id: string;
@@ -119,12 +122,24 @@ export function CalendarView() {
               }
             }
 
+            // Parse the date/time from the timestamp
+            const startDate = new Date(task.due_date);
+            const endDate = new Date(startDate);
+
+            // If the time is midnight (00:00), treat as all-day event
+            const isAllDay = startDate.getHours() === 0 && startDate.getMinutes() === 0;
+
+            // For timed events, set a default 1-hour duration if not specified
+            if (!isAllDay) {
+              endDate.setHours(startDate.getHours() + 1);
+            }
+
             calendarEvents.push({
               id: `task-${task.id}`,
               title: `Task: ${taskTitle}`,
-              start: new Date(task.due_date),
-              end: new Date(task.due_date),
-              allDay: true,
+              start: startDate,
+              end: endDate,
+              allDay: isAllDay,
               resource: {
                 type: 'task',
                 id: task.id,
@@ -223,6 +238,60 @@ export function CalendarView() {
     setShowCreateModal(true);
   };
 
+  const handleEventDrop = async ({ event, start, end }: { event: CalendarEvent; start: Date; end: Date }) => {
+    try {
+      const { resource } = event;
+
+      if (resource.type === 'task') {
+        // Update the task's due_date in the database
+        await db.updateTask(resource.id, {
+          due_date: start.toISOString(),
+        });
+
+        toast.success('Task rescheduled successfully');
+        fetchEvents();
+      } else if (resource.type === 'item') {
+        // Update the item's due_date in the database
+        await db.updateItem(resource.id, {
+          due_date: start.toISOString(),
+        });
+
+        toast.success('Item rescheduled successfully');
+        fetchEvents();
+      }
+    } catch (error) {
+      console.error('Error rescheduling event:', error);
+      toast.error('Failed to reschedule event');
+    }
+  };
+
+  const handleEventResize = async ({ event, start, end }: { event: CalendarEvent; start: Date; end: Date }) => {
+    try {
+      const { resource } = event;
+
+      if (resource.type === 'task') {
+        // Update the task's due_date
+        await db.updateTask(resource.id, {
+          due_date: start.toISOString(),
+        });
+
+        toast.success('Task updated successfully');
+        fetchEvents();
+      } else if (resource.type === 'item') {
+        // Update the item's due_date
+        await db.updateItem(resource.id, {
+          due_date: start.toISOString(),
+        });
+
+        toast.success('Item updated successfully');
+        fetchEvents();
+      }
+    } catch (error) {
+      console.error('Error updating event:', error);
+      toast.error('Failed to update event');
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -311,7 +380,7 @@ export function CalendarView() {
       )}
 
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6" style={{ height: '700px' }}>
-        <Calendar
+        <DnDCalendar
           localizer={localizer}
           events={events}
           startAccessor="start"
@@ -324,6 +393,10 @@ export function CalendarView() {
           onSelectSlot={handleSelectSlot}
           eventPropGetter={eventStyleGetter}
           className="h-full"
+          draggableAccessor={() => true}
+          resizable
+          onEventDrop={handleEventDrop}
+          onEventResize={handleEventResize}
           onSelectEvent={(event) => {
             const { resource } = event;
             if (resource.type === 'item') {
