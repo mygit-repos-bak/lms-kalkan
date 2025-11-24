@@ -75,14 +75,14 @@ export function TaskCard({ task, isDragging = false, onEdit, onClick, onCreateSu
       onClick={onClick}
     >
       {/* Task Level Indicator for subtasks */}
-      {task.task_level > 0 && (
+      {task.task_level > 0 && task.parent && (
         <div className={clsx(
-          "absolute -left-2 top-4 w-5 h-5 rounded-full flex items-center justify-center text-white text-xs font-bold",
+          "absolute -left-2 top-4 px-2 py-1 rounded flex items-center justify-center text-white text-xs font-medium max-w-[150px] truncate",
           task.task_level === 1 ? 'bg-blue-500' :
           task.task_level === 2 ? 'bg-green-500' :
           'bg-purple-500'
-        )}>
-          <span>{task.task_level}</span>
+        )} title={task.parent.title}>
+          <span className="truncate">{task.parent.title}</span>
         </div>
       )}
 
