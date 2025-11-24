@@ -144,7 +144,7 @@ export function TaskCard({ task, isDragging = false, onEdit, onClick, onCreateSu
       {/* Parent Task Info for Subtasks */}
       {task.task_level > 0 && task.parent && (
         <div className="mb-3 p-2 bg-gray-100 rounded text-xs text-gray-600 border-l-2 border-gray-300">
-          <span className="font-medium">Parent: {task.parent.title}</span>
+          <span className="font-medium">{task.parent.title}</span>
         </div>
       )}
       {task.description && (
