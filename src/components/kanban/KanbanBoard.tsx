@@ -143,10 +143,24 @@ export function KanbanBoard({ itemId, sectionId, showCombined = false }: KanbanB
     }
 
     const taskId = active.id as string;
-    const newStage = over.id as string;
     const task = tasks.find(t => t.id === taskId);
 
-    if (!task || task.stage === newStage) return;
+    if (!task) return;
+
+    // Determine the target stage
+    // If dropped on a stage column, over.id is the stage name
+    // If dropped on another task, over.id is the task id - find that task's stage
+    let newStage: string;
+    const targetTask = tasks.find(t => t.id === over.id);
+    if (targetTask) {
+      // Dropped on another task - use that task's stage
+      newStage = targetTask.stage;
+    } else {
+      // Dropped on a stage column directly
+      newStage = over.id as string;
+    }
+
+    if (task.stage === newStage) return;
 
     // Optimistic update
     setTasks(prev => prev.map(t => 
