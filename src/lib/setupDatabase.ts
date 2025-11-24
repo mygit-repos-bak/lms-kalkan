@@ -103,7 +103,7 @@ export async function createSampleData() {
         .insert({
           id: authUser.id,
           name: 'Admin User',
-          email: authUser.email || 'admin@example.com',
+          email: authUser.email || 'admin@kalkan.bartonapps.com',
           role: 'admin',
           active: true,
           notification_prefs: {

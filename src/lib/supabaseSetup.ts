@@ -89,7 +89,7 @@ After running BOTH files, you'll have:
 - Complete tag assignments
 
 🔑 LOGIN CREDENTIALS:
-- Email: admin@example.com
+- Email: admin@kalkan.bartonapps.com
 - Password: admin123
 - (All demo users have the same password: admin123)
 

@@ -50,7 +50,7 @@ export const localAuth = {
     }
 
     // Simple password check (in real app, this would be hashed)
-    if (email === 'admin@example.com' && password === 'admin123') {
+    if (email === 'admin@kalkan.bartonapps.com' && password === 'admin123') {
       setToStorage(STORAGE_KEYS.CURRENT_USER, user);
       return { user };
     }

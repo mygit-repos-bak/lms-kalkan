@@ -16,7 +16,7 @@ async function runSetup() {
   console.log('🎯 Database is ready for use!');
   console.log('');
   console.log('🔑 Login with:');
-  console.log('   Email: admin@example.com');
+  console.log('   Email: admin@kalkan.bartonapps.com');
   console.log('   Password: admin123');
 }
 
