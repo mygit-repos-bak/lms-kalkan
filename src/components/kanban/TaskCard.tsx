@@ -97,7 +97,7 @@ export function TaskCard({ task, isDragging = false, onEdit, onClick, onCreateSu
         </div>
       )}
 
-      <div className="flex items-start justify-between gap-2 mb-3">
+      <div className="mb-3">
         <div className={clsx(
           "flex-1 min-w-0",
           task.task_level > 0 && task.parent && "pt-5"
@@ -111,40 +111,6 @@ export function TaskCard({ task, isDragging = false, onEdit, onClick, onCreateSu
           )}>
             {task.title}
           </h4>
-        </div>
-        <div className="flex items-start space-x-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
-          {onCreateSubtask && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onCreateSubtask();
-              }}
-              className="p-1 hover:bg-gray-100 rounded transition-colors"
-              title="Create subtask"
-            >
-              <Plus className="w-3 h-3 text-gray-400" />
-            </button>
-          )}
-          {onEdit && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onEdit();
-              }}
-              className="p-1 hover:bg-gray-100 rounded transition-colors"
-              title="Edit task"
-            >
-              <Edit3 className="w-3 h-3 text-gray-400" />
-            </button>
-          )}
-          <div
-            {...listeners}
-            className="p-1 cursor-grab active:cursor-grabbing hover:bg-gray-100 rounded transition-colors"
-            onClick={(e) => e.stopPropagation()}
-            title="Move task"
-          >
-            <GripVertical className="w-3 h-3 text-gray-400" />
-          </div>
         </div>
       </div>
 
@@ -211,16 +177,53 @@ export function TaskCard({ task, isDragging = false, onEdit, onClick, onCreateSu
           </div>
         )}
 
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onClick && onClick();
-          }}
-          className="p-1 hover:bg-gray-100 rounded transition-colors"
-          title="View task details"
-        >
-          <Eye className="w-3 h-3" />
-        </button>
+        <div className="flex items-center justify-between">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onClick && onClick();
+            }}
+            className="p-1 hover:bg-gray-100 rounded transition-colors"
+            title="View task details"
+          >
+            <Eye className="w-3 h-3" />
+          </button>
+
+          <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            {onCreateSubtask && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onCreateSubtask();
+                }}
+                className="p-1 hover:bg-gray-100 rounded transition-colors"
+                title="Create subtask"
+              >
+                <Plus className="w-3 h-3 text-gray-400" />
+              </button>
+            )}
+            {onEdit && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEdit();
+                }}
+                className="p-1 hover:bg-gray-100 rounded transition-colors"
+                title="Edit task"
+              >
+                <Edit3 className="w-3 h-3 text-gray-400" />
+              </button>
+            )}
+            <div
+              {...listeners}
+              className="p-1 cursor-grab active:cursor-grabbing hover:bg-gray-100 rounded transition-colors"
+              onClick={(e) => e.stopPropagation()}
+              title="Move task"
+            >
+              <GripVertical className="w-3 h-3 text-gray-400" />
+            </div>
+          </div>
+        </div>
 
         {task.tags && task.tags.length > 0 && (
           <div className="flex flex-wrap gap-1">
