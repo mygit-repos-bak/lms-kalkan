@@ -112,7 +112,7 @@ export function LoginPage() {
           <h3 className="text-sm font-medium text-amber-800 mb-2">Demo Credentials</h3>
           <div className="text-xs text-amber-700 space-y-1">
             <div><strong>Super Admin:</strong></div>
-            <div>Email: admin_super@example.com</div>
+            <div>Email: admin@kalkan.bartonapps.com</div>
             <div>Password: admin1234</div>
           </div>
         </div> */}

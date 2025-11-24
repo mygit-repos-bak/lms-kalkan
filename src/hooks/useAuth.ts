@@ -12,14 +12,14 @@ interface AuthContextType {
 
 // Mock authentication for demo purposes
 const DEMO_CREDENTIALS = {
-  email: 'admin_super@example.com',
+  email: 'admin@kalkan.bartonapps.com',
   password: 'admin1234'
 };
 
 const DEMO_USER: AppUser = {
   id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
   name: 'Super Admin',
-  email: 'admin_super@example.com',
+  email: 'admin@kalkan.bartonapps.com',
   role: 'admin',
   active: true,
   notification_prefs: {
