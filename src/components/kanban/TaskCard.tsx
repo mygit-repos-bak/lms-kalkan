@@ -30,6 +30,17 @@ export function TaskCard({ task, isDragging = false, onEdit, onClick, onCreateSu
     transition,
   };
 
+  // Debug logging
+  if (task.task_level > 0) {
+    console.log('Subtask card:', {
+      title: task.title,
+      level: task.task_level,
+      parent_task_id: task.parent_task_id,
+      parent: task.parent,
+      hasParent: !!task.parent
+    });
+  }
+
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'urgent': return 'border-l-red-500 bg-red-50';
