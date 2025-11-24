@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { Calendar, User, GripVertical, AlertCircle, Clock, CheckSquare, Eye, CreditCard as Edit3, ExternalLink, Move, Plus, Layers, Trash2 } from 'lucide-react';
+import { Calendar, User, GripVertical, AlertCircle, Clock, CheckSquare, Eye, Pen, ExternalLink, Move, Plus, Layers, Trash2 } from 'lucide-react';
 import { Task } from '../../types/database';
 import clsx from 'clsx';
 
@@ -211,7 +211,7 @@ export function TaskCard({ task, isDragging = false, onEdit, onClick, onCreateSu
                 className="p-1 hover:bg-gray-100 rounded transition-colors"
                 title="Edit task"
               >
-                <Edit3 className="w-3 h-3 text-gray-400" />
+                <Pen className="w-3 h-3 text-gray-400" />
               </button>
             )}
             {onDelete && (
