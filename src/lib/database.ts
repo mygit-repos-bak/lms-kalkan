@@ -392,22 +392,40 @@ export const db = {
         tags:task_tags(
           tag:tags(*)
         ),
-        item:items(*),
-        parent:tasks!parent_task_id(*)
+        item:items(*)
       `)
       .order('created_at', { ascending: false });
-    
+
     if (itemId) {
       query = query.eq('item_id', itemId);
     }
-    
+
     const { data, error } = await query;
-    
+
     if (error) {
       console.error('❌ Supabase error fetching tasks:', error);
       throw new Error(`Failed to fetch tasks: ${error.message}`);
     }
-    
+
+    // Get all parent task IDs
+    const parentTaskIds = [...new Set(data?.filter(t => t.parent_task_id).map(t => t.parent_task_id))];
+
+    // Fetch parent tasks separately
+    let parentTasks: any[] = [];
+    if (parentTaskIds.length > 0) {
+      const { data: parents, error: parentError } = await supabase
+        .from('tasks')
+        .select('id, title, task_level, stage')
+        .in('id', parentTaskIds);
+
+      if (!parentError && parents) {
+        parentTasks = parents;
+      }
+    }
+
+    // Create a map of parent tasks for quick lookup
+    const parentMap = new Map(parentTasks.map(p => [p.id, p]));
+
     // Transform the data to match our expected format
     const transformedData = data?.map(task => ({
       ...task,
@@ -415,11 +433,11 @@ export const db = {
       tags: task.tags?.map((t: any) => t.tag) || [],
       assignee_ids: task.assignees?.map((a: any) => a.user.id) || [],
       tag_ids: task.tags?.map((t: any) => t.tag.id) || [],
-      children: task.children || [],
-      parent: task.parent || null
+      parent: task.parent_task_id ? parentMap.get(task.parent_task_id) || null : null
     })) || [];
-    
+
     console.log('✅ Successfully fetched tasks from Supabase:', transformedData.length);
+    console.log('✅ Attached parent data to', transformedData.filter(t => t.parent).length, 'subtasks');
     return transformedData;
   },
 
