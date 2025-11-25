@@ -251,10 +251,29 @@ export default function TaskDetailModal({ isOpen, onClose, task, onEdit, onDelet
             {/* Parent Task Information */}
             {task.parent && (
               <div>
-                <h3 className="text-sm font-medium text-gray-900 mb-2">Parent Task</h3>
-                <div className="p-3 bg-gray-50 rounded-lg">
-                  <div className="text-sm font-medium text-gray-900">{task.parent.title}</div>
-                  <div className="text-xs text-gray-500 mt-1">Level {task.parent.task_level}</div>
+                <h3 className="text-sm font-medium text-gray-900 mb-2">
+                  {task.task_level === 2 ? 'Task Hierarchy' : 'Parent Task'}
+                </h3>
+                <div className="space-y-2">
+                  {/* Show grandparent for level 2 tasks */}
+                  {task.task_level === 2 && task.parent.parent && (
+                    <div className="p-3 bg-gray-50 rounded-lg border-l-4 border-blue-500">
+                      <div className="text-xs text-gray-500 mb-1">Grandparent Task (Level 0)</div>
+                      <div className="text-sm font-medium text-gray-900">{task.parent.parent.title}</div>
+                      {task.parent.parent.description && (
+                        <div className="text-xs text-gray-500 mt-1">{task.parent.parent.description}</div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Show parent task */}
+                  <div className="p-3 bg-gray-50 rounded-lg border-l-4 border-blue-400">
+                    <div className="text-xs text-gray-500 mb-1">Parent Task (Level {task.parent.task_level})</div>
+                    <div className="text-sm font-medium text-gray-900">{task.parent.title}</div>
+                    {task.parent.description && (
+                      <div className="text-xs text-gray-500 mt-1">{task.parent.description}</div>
+                    )}
+                  </div>
                 </div>
               </div>
             )}

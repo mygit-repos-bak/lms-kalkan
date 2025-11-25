@@ -464,6 +464,78 @@ export const db = {
     return transformedData;
   },
 
+  async getTaskById(taskId: string) {
+    console.log('🔍 Fetching task by ID from Supabase...', taskId);
+
+    const { data: task, error } = await supabase
+      .from('tasks')
+      .select(`
+        *,
+        assignees:task_assignees(
+          user:users(*)
+        ),
+        tags:task_tags(
+          tag:tags(*)
+        ),
+        item:items(*)
+      `)
+      .eq('id', taskId)
+      .maybeSingle();
+
+    if (error) {
+      console.error('❌ Supabase error fetching task by ID:', error);
+      throw new Error(`Failed to fetch task: ${error.message}`);
+    }
+
+    if (!task) {
+      return null;
+    }
+
+    // Fetch parent task if exists
+    let parent = null;
+    if (task.parent_task_id) {
+      const { data: parentTask } = await supabase
+        .from('tasks')
+        .select('id, title, description, task_level, stage, parent_task_id')
+        .eq('id', task.parent_task_id)
+        .maybeSingle();
+
+      parent = parentTask;
+
+      // Fetch grandparent task if parent has a parent (for level 2 tasks)
+      if (parentTask && parentTask.parent_task_id) {
+        const { data: grandparentTask } = await supabase
+          .from('tasks')
+          .select('id, title, description, task_level, stage')
+          .eq('id', parentTask.parent_task_id)
+          .maybeSingle();
+
+        if (grandparentTask) {
+          parent.parent = grandparentTask;
+        }
+      }
+    }
+
+    // Fetch children tasks
+    const { data: children } = await supabase
+      .from('tasks')
+      .select('id, title, status, task_level')
+      .eq('parent_task_id', taskId);
+
+    const transformedTask = {
+      ...task,
+      assignees: task.assignees?.map((a: any) => a.user) || [],
+      tags: task.tags?.map((t: any) => t.tag) || [],
+      assignee_ids: task.assignees?.map((a: any) => a.user.id) || [],
+      tag_ids: task.tags?.map((t: any) => t.tag.id) || [],
+      parent,
+      children: children || []
+    };
+
+    console.log('✅ Successfully fetched task by ID from Supabase');
+    return transformedTask;
+  },
+
   async createTask(taskData: any) {
     console.log('➕ Creating task in Supabase...');
     

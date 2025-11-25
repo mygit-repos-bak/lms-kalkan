@@ -7,6 +7,7 @@ import { ChevronLeft, ChevronRight, Filter, Download, Bell } from 'lucide-react'
 import { toast } from 'react-hot-toast';
 import { Item, Task } from '../../types/database';
 import ItemModal from '../items/ItemModal';
+import TaskDetailModal from '../tasks/TaskDetailModal';
 import clsx from 'clsx';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
@@ -42,6 +43,8 @@ export function CalendarView() {
   const [selectedSections, setSelectedSections] = useState(['legal', 'deals', 'real-estate', 'others']);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState<{ start: Date; end: Date } | null>(null);
+  const [showTaskModal, setShowTaskModal] = useState(false);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
   useEffect(() => {
     fetchEvents();
@@ -397,10 +400,20 @@ export function CalendarView() {
           resizable
           onEventDrop={handleEventDrop}
           onEventResize={handleEventResize}
-          onSelectEvent={(event) => {
+          onSelectEvent={async (event) => {
             const { resource } = event;
-            if (resource.type === 'item') {
-              window.open(`/${resource.sectionId}/${resource.itemId}`, '_blank');
+            if (resource.type === 'task') {
+              // Fetch full task details with parent/grandparent relationships
+              try {
+                const task = await db.getTaskById(resource.id);
+                if (task) {
+                  setSelectedTask(task);
+                  setShowTaskModal(true);
+                }
+              } catch (error) {
+                console.error('Error fetching task:', error);
+                toast.error('Failed to load task details');
+              }
             } else {
               window.open(`/${resource.sectionId}/${resource.itemId}`, '_blank');
             }
@@ -518,6 +531,15 @@ export function CalendarView() {
           setShowCreateModal(false);
           setSelectedSlot(null);
         }}
+      />
+
+      <TaskDetailModal
+        isOpen={showTaskModal}
+        onClose={() => {
+          setShowTaskModal(false);
+          setSelectedTask(null);
+        }}
+        task={selectedTask}
       />
     </div>
   );
