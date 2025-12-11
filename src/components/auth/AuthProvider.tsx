@@ -14,14 +14,14 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // Demo credentials
 const DEMO_CREDENTIALS = {
-  email: 'admin@kalkan.bartonapps.com',
+  email: 'admin@lf.bartonapps.com',
   password: 'admin1234'
 };
 
 const DEMO_USER: AppUser = {
-  id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
-  name: 'Super Admin',
-  email: 'admin@kalkan.bartonapps.com',
+  id: 'd36ba832-bcf7-481a-98c4-a9bfe71335c5',
+  name: 'Admin',
+  email: 'admin@lf.bartonapps.com',
   role: 'admin',
   active: true,
   notification_prefs: {
