@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Search, Filter, Grid3x3 as Grid3X3, List, MoreVertical, Calendar, User, Tag, AlertCircle, Download, Upload, ChevronDown } from 'lucide-react';
+import { Plus, Search, Filter, Grid3x3 as Grid3X3, List, MoreVertical, Calendar, User, Tag, AlertCircle, Download, Upload, ChevronDown, Edit, Trash2 } from 'lucide-react';
 import { db } from '../../lib/database';
 import { toast } from 'react-hot-toast';
 import { Item, User as UserType, Tag as TagType } from '../../types/database';
@@ -34,6 +34,9 @@ export function SectionListView({ sectionId, sectionName, icon: Icon, color }: S
     cityApprovals: []
   });
   const { canCreateItem } = usePermissions();
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const [editingItem, setEditingItem] = useState<Item | undefined>(undefined);
+  const [showEditModal, setShowEditModal] = useState(false);
   
   const [filters, setFilters] = useState({
     status: [] as string[],
@@ -52,6 +55,20 @@ export function SectionListView({ sectionId, sectionName, icon: Icon, color }: S
     fetchTags();
     fetchSystemConfig();
   }, [sectionId]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (openMenuId) {
+        const target = event.target as HTMLElement;
+        if (!target.closest('.dropdown-menu')) {
+          setOpenMenuId(null);
+        }
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [openMenuId]);
 
   const fetchItems = async () => {
     try {
@@ -180,6 +197,28 @@ export function SectionListView({ sectionId, sectionName, icon: Icon, color }: S
       case 'normal': return 'bg-blue-100 text-blue-800 border-blue-200';
       case 'low': return 'bg-gray-100 text-gray-800 border-gray-200';
       default: return 'bg-gray-100 text-gray-800 border-gray-200';
+    }
+  };
+
+  const handleEditItem = (item: Item) => {
+    setEditingItem(item);
+    setShowEditModal(true);
+    setOpenMenuId(null);
+  };
+
+  const handleDeleteItem = async (itemId: string) => {
+    if (!window.confirm('Are you sure you want to delete this item? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      await db.deleteItem(itemId);
+      toast.success('Item deleted successfully');
+      fetchItems();
+      setOpenMenuId(null);
+    } catch (error) {
+      console.error('Error deleting item:', error);
+      toast.error('Failed to delete item');
     }
   };
 
@@ -738,9 +777,32 @@ export function SectionListView({ sectionId, sectionName, icon: Icon, color }: S
                     </div>
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                      <MoreVertical className="w-4 h-4" />
-                    </button>
+                    <div className="relative dropdown-menu">
+                      <button
+                        onClick={() => setOpenMenuId(openMenuId === item.id ? null : item.id)}
+                        className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                      >
+                        <MoreVertical className="w-4 h-4" />
+                      </button>
+                      {openMenuId === item.id && (
+                        <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-10">
+                          <button
+                            onClick={() => handleEditItem(item)}
+                            className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center transition-colors"
+                          >
+                            <Edit className="w-4 h-4 mr-2" />
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleDeleteItem(item.id)}
+                            className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center transition-colors"
+                          >
+                            <Trash2 className="w-4 h-4 mr-2" />
+                            Delete
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -750,17 +812,17 @@ export function SectionListView({ sectionId, sectionName, icon: Icon, color }: S
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredItems.map((item) => (
-            <Link
+            <div
               key={item.id}
-              to={`/${sectionId}/${item.id}`}
-              className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-all transform hover:scale-[1.02]"
+              className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-all relative"
             >
-              <div className="flex items-start justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900 line-clamp-2">{item.title}</h3>
-                <span className={clsx('inline-flex px-2 py-1 text-xs font-medium rounded-full border', getPriorityColor(item.priority))}>
-                  {item.priority}
-                </span>
-              </div>
+              <Link to={`/${sectionId}/${item.id}`} className="block">
+                <div className="flex items-start justify-between mb-4">
+                  <h3 className="text-lg font-semibold text-gray-900 line-clamp-2">{item.title}</h3>
+                  <span className={clsx('inline-flex px-2 py-1 text-xs font-medium rounded-full border', getPriorityColor(item.priority))}>
+                    {item.priority}
+                  </span>
+                </div>
 
               <p className="text-gray-600 text-sm mb-4 line-clamp-3">{item.description}</p>
 
@@ -809,7 +871,46 @@ export function SectionListView({ sectionId, sectionName, icon: Icon, color }: S
                   </div>
                 )}
               </div>
-            </Link>
+              </Link>
+              <div className="absolute top-4 right-4 dropdown-menu">
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setOpenMenuId(openMenuId === item.id ? null : item.id);
+                  }}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <MoreVertical className="w-4 h-4" />
+                </button>
+                {openMenuId === item.id && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-10">
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleEditItem(item);
+                      }}
+                      className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center transition-colors"
+                    >
+                      <Edit className="w-4 h-4 mr-2" />
+                      Edit
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleDeleteItem(item.id);
+                      }}
+                      className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center transition-colors"
+                    >
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Delete
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
           ))}
         </div>
       )}
@@ -842,6 +943,25 @@ export function SectionListView({ sectionId, sectionName, icon: Icon, color }: S
           setShowCreateModal(false);
         }}
       />
+
+      {/* Edit Modal */}
+      {editingItem && (
+        <ItemModal
+          isOpen={showEditModal}
+          onClose={() => {
+            setShowEditModal(false);
+            setEditingItem(undefined);
+          }}
+          sectionId={sectionId}
+          sectionName={sectionName}
+          item={editingItem}
+          onItemSaved={() => {
+            fetchItems();
+            setShowEditModal(false);
+            setEditingItem(undefined);
+          }}
+        />
+      )}
     </div>
   );
 }
