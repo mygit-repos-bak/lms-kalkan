@@ -107,16 +107,6 @@ export function LoginPage() {
           </button>
         </form>
 
-        {/* Demo Credentials */}
-        <div className="mt-8 p-4 bg-amber-50 border border-amber-200 rounded-lg">
-          <h3 className="text-sm font-medium text-amber-800 mb-2">Demo Credentials</h3>
-          <div className="text-xs text-amber-700 space-y-1">
-            <div><strong>Admin:</strong></div>
-            <div>Email: admin@kalkan.bartonapps.com</div>
-            <div>Password: admin1234</div>
-          </div>
-        </div>
-
         {/* Footer */}
         <div className="mt-8 text-center text-xs text-gray-500">
           <p>© 2025 LegalFlow Management Platform</p>
