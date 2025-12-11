@@ -37,6 +37,7 @@ export function SectionListView({ sectionId, sectionName, icon: Icon, color }: S
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [editingItem, setEditingItem] = useState<Item | undefined>(undefined);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showExportMenu, setShowExportMenu] = useState(false);
   
   const [filters, setFilters] = useState({
     status: [] as string[],
@@ -58,17 +59,20 @@ export function SectionListView({ sectionId, sectionName, icon: Icon, color }: S
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (openMenuId) {
-        const target = event.target as HTMLElement;
-        if (!target.closest('.dropdown-menu')) {
-          setOpenMenuId(null);
-        }
+      const target = event.target as HTMLElement;
+
+      if (openMenuId && !target.closest('.dropdown-menu')) {
+        setOpenMenuId(null);
+      }
+
+      if (showExportMenu && !target.closest('.export-menu')) {
+        setShowExportMenu(false);
       }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [openMenuId]);
+  }, [openMenuId, showExportMenu]);
 
   const fetchItems = async () => {
     try {
@@ -222,6 +226,147 @@ export function SectionListView({ sectionId, sectionName, icon: Icon, color }: S
     }
   };
 
+  const exportToCSV = () => {
+    const headers = ['Title', 'Description', 'Status', 'Priority', 'Assignees', 'Due Date', 'Tags'];
+    const rows = filteredItems.map(item => [
+      item.title,
+      item.description,
+      item.status,
+      item.priority,
+      item.assignees?.map(a => a.name).join(', ') || '',
+      item.due_date ? new Date(item.due_date).toLocaleDateString() : '',
+      item.tags?.map(t => t.name).join(', ') || ''
+    ]);
+
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${sectionName.toLowerCase().replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+    setShowExportMenu(false);
+    toast.success('Exported to CSV');
+  };
+
+  const exportToExcel = () => {
+    const headers = ['Title', 'Description', 'Status', 'Priority', 'Assignees', 'Due Date', 'Tags'];
+    const rows = filteredItems.map(item => [
+      item.title,
+      item.description,
+      item.status,
+      item.priority,
+      item.assignees?.map(a => a.name).join(', ') || '',
+      item.due_date ? new Date(item.due_date).toLocaleDateString() : '',
+      item.tags?.map(t => t.name).join(', ') || ''
+    ]);
+
+    let html = '<table><thead><tr>';
+    headers.forEach(header => {
+      html += `<th>${header}</th>`;
+    });
+    html += '</tr></thead><tbody>';
+
+    rows.forEach(row => {
+      html += '<tr>';
+      row.forEach(cell => {
+        html += `<td>${cell}</td>`;
+      });
+      html += '</tr>';
+    });
+    html += '</tbody></table>';
+
+    const blob = new Blob([html], { type: 'application/vnd.ms-excel' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${sectionName.toLowerCase().replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.xls`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+    setShowExportMenu(false);
+    toast.success('Exported to Excel');
+  };
+
+  const exportToPDF = () => {
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) return;
+
+    const html = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>${sectionName} - ${new Date().toLocaleDateString()}</title>
+          <style>
+            body { font-family: Arial, sans-serif; padding: 20px; }
+            h1 { color: #1f2937; margin-bottom: 20px; }
+            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+            th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+            th { background-color: #f3f4f6; font-weight: 600; }
+            tr:nth-child(even) { background-color: #f9fafb; }
+            .priority-urgent { color: #dc2626; font-weight: 600; }
+            .priority-high { color: #ea580c; font-weight: 600; }
+            .priority-normal { color: #2563eb; }
+            .priority-low { color: #6b7280; }
+            @media print {
+              button { display: none; }
+            }
+          </style>
+        </head>
+        <body>
+          <h1>${sectionName}</h1>
+          <p><strong>Generated:</strong> ${new Date().toLocaleString()}</p>
+          <p><strong>Total Items:</strong> ${filteredItems.length}</p>
+          <table>
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Status</th>
+                <th>Priority</th>
+                <th>Assignees</th>
+                <th>Due Date</th>
+                <th>Tags</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${filteredItems.map(item => `
+                <tr>
+                  <td><strong>${item.title}</strong></td>
+                  <td>${item.description}</td>
+                  <td>${item.status}</td>
+                  <td class="priority-${item.priority}">${item.priority}</td>
+                  <td>${item.assignees?.map(a => a.name).join(', ') || 'Unassigned'}</td>
+                  <td>${item.due_date ? new Date(item.due_date).toLocaleDateString() : 'No deadline'}</td>
+                  <td>${item.tags?.map(t => t.name).join(', ') || 'No tags'}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+          <script>
+            window.onload = function() {
+              setTimeout(function() {
+                window.print();
+                window.onafterprint = function() {
+                  window.close();
+                };
+              }, 250);
+            };
+          </script>
+        </body>
+      </html>
+    `;
+
+    printWindow.document.write(html);
+    printWindow.document.close();
+    setShowExportMenu(false);
+    toast.success('Opening print dialog for PDF export');
+  };
+
   const canCreate = canCreateItem(sectionId);
 
   if (loading) {
@@ -317,12 +462,43 @@ export function SectionListView({ sectionId, sectionName, icon: Icon, color }: S
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
           />
         </div>
-        
-        <button className="flex items-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors" title="Export data">
-          
-          <Download className="w-5 h-5 mr-2" />
-          Export
-        </button>
+
+        <div className="relative export-menu">
+          <button
+            onClick={() => setShowExportMenu(!showExportMenu)}
+            className="flex items-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            title="Export data"
+          >
+            <Download className="w-5 h-5 mr-2" />
+            Export
+            <ChevronDown className={clsx('w-4 h-4 ml-2 transition-transform', showExportMenu && 'rotate-180')} />
+          </button>
+          {showExportMenu && (
+            <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-10">
+              <button
+                onClick={exportToPDF}
+                className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center transition-colors"
+              >
+                <FileText className="w-4 h-4 mr-2" />
+                Export as PDF
+              </button>
+              <button
+                onClick={exportToExcel}
+                className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center transition-colors"
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Export as Excel
+              </button>
+              <button
+                onClick={exportToCSV}
+                className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center transition-colors"
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Export as CSV
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Advanced Filters */}
