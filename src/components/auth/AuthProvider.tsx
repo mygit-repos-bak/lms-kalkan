@@ -41,15 +41,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user is already logged in
+    // Clear any cached session with old email
     const savedUser = sessionStorage.getItem('legalflow_user');
     if (savedUser) {
       try {
         const parsedUser = JSON.parse(savedUser);
-        
+
+        // If email is from the old domain, clear it
+        if (parsedUser.email && parsedUser.email.includes('@kalkan.bartonapps.com')) {
+          console.log('Clearing old session with email:', parsedUser.email);
+          sessionStorage.removeItem('legalflow_user');
+          setLoading(false);
+          return;
+        }
+
         // Validate user ID is a proper UUID
         const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-        
+
         if (parsedUser.id && uuidRegex.test(parsedUser.id)) {
           setUser(parsedUser);
         } else {
