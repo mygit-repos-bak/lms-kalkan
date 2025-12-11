@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Search, Filter, Grid3x3 as Grid3X3, List, MoreVertical, Calendar, User, Tag, AlertCircle, Download, Upload, ChevronDown, Edit, Trash2 } from 'lucide-react';
+import { Plus, Search, Filter, Grid3x3 as Grid3X3, List, MoreVertical, Calendar, User, Tag, AlertCircle, Download, Upload, ChevronDown, Edit, Trash2, FileText } from 'lucide-react';
 import { db } from '../../lib/database';
 import { toast } from 'react-hot-toast';
 import { Item, User as UserType, Tag as TagType } from '../../types/database';
