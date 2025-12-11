@@ -17,7 +17,7 @@ const DEMO_CREDENTIALS = {
 };
 
 const DEMO_USER: AppUser = {
-  id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
+  id: 'd36ba832-bcf7-481a-98c4-a9bfe71335c5',
   name: 'Super Admin',
   email: 'admin@kalkan.bartonapps.com',
   role: 'admin',
