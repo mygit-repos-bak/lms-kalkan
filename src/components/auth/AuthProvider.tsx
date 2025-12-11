@@ -67,8 +67,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signIn = async (email: string, password: string): Promise<{ error?: string }> => {
     // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    if (email === DEMO_CREDENTIALS.email && password === DEMO_CREDENTIALS.password) {
+
+    // Support both old and new email addresses
+    const validEmails = ['admin@lf.bartonapps.com', 'admin@kalkan.bartonapps.com'];
+
+    if (validEmails.includes(email) && password === DEMO_CREDENTIALS.password) {
       setUser(DEMO_USER);
       sessionStorage.setItem('legalflow_user', JSON.stringify(DEMO_USER));
       return {};
