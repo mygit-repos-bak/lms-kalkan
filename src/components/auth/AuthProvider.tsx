@@ -14,14 +14,14 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // Demo credentials
 const DEMO_CREDENTIALS = {
-  email: 'admin@lf.bartonapps.com',
+  email: 'admin@kalkan.bartonapps.com',
   password: 'admin1234'
 };
 
 const DEMO_USER: AppUser = {
   id: 'd36ba832-bcf7-481a-98c4-a9bfe71335c5',
   name: 'Admin',
-  email: 'admin@lf.bartonapps.com',
+  email: 'admin@kalkan.bartonapps.com',
   role: 'admin',
   active: true,
   notification_prefs: {
@@ -48,7 +48,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const parsedUser = JSON.parse(savedUser);
 
         // If email is from the old domain, clear it
-        if (parsedUser.email && parsedUser.email.includes('@kalkan.bartonapps.com')) {
+        if (parsedUser.email && parsedUser.email.includes('@lf.bartonapps.com')) {
           console.log('Clearing old session with email:', parsedUser.email);
           sessionStorage.removeItem('legalflow_user');
           setLoading(false);
