@@ -73,11 +73,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const signIn = async (email: string, password: string): Promise<{ error?: string }> => {
+    console.log('Sign in attempt:', { email, passwordLength: password.length });
+
     // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 1000));
 
     // Support both old and new email addresses
     const validEmails = ['admin@lf.bartonapps.com', 'admin@kalkan.bartonapps.com'];
+
+    console.log('Valid emails:', validEmails);
+    console.log('Email match:', validEmails.includes(email));
+    console.log('Password match:', password === DEMO_CREDENTIALS.password);
+    console.log('Expected password:', DEMO_CREDENTIALS.password);
 
     if (validEmails.includes(email) && password === DEMO_CREDENTIALS.password) {
       setUser(DEMO_USER);

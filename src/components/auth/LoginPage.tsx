@@ -12,7 +12,7 @@ export function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!email || !password) {
       toast.error('Please enter both email and password');
       return;
@@ -21,7 +21,7 @@ export function LoginPage() {
     setLoading(true);
 
     try {
-      const { error } = await signIn(email, password);
+      const { error } = await signIn(email.trim(), password.trim());
       
       if (error) {
         toast.error(error);
@@ -108,14 +108,14 @@ export function LoginPage() {
         </form>
 
         {/* Demo Credentials */}
-        {/* <div className="mt-8 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+        <div className="mt-8 p-4 bg-amber-50 border border-amber-200 rounded-lg">
           <h3 className="text-sm font-medium text-amber-800 mb-2">Demo Credentials</h3>
           <div className="text-xs text-amber-700 space-y-1">
             <div><strong>Admin:</strong></div>
             <div>Email: admin@lf.bartonapps.com</div>
             <div>Password: admin1234</div>
           </div>
-        </div> */}
+        </div>
 
         {/* Footer */}
         <div className="mt-8 text-center text-xs text-gray-500">
